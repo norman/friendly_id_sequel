@@ -44,6 +44,7 @@ module FriendlyId
       end
 
       def validate
+        return if skip_friendly_id_validations
         column = friendly_id_config.column
         value = send(column)
         return errors.add(column, "can't be blank") if value.blank?
@@ -51,6 +52,10 @@ module FriendlyId
       end
 
       private
+
+      def skip_friendly_id_validations
+        friendly_id.nil? && self.class.friendly_id_config.allow_nil?
+      end
 
       def friendly_id_config
         self.class.friendly_id_config
