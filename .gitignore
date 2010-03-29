@@ -6,3 +6,5 @@ docs
 pkg
 coverage
 *.swp
+.bundle
+Gemfile.lock
