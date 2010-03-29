@@ -49,6 +49,10 @@ module FriendlyId
         FriendlyId::SequelAdapter::Slug
       end
 
+      def find_slug(name, sequence)
+        slugs_dataset.where("slugs.name" => name, "slugs.sequence" => sequence).first
+      end
+
       private
 
       def after_save
