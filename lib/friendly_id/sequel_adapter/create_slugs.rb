@@ -1,3 +1,5 @@
+require "sequel/extensions/migration"
+
 module FriendlyId
   module SequelAdapter
     class CreateSlugs < ::Sequel::Migration

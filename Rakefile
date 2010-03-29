@@ -5,7 +5,7 @@ require "rake/clean"
 
 CLEAN << "pkg" << "doc" << "coverage" << ".yardoc"
 
-# Rake::GemPackageTask.new(eval(File.read("friendly_id_sequel.gemspec"))) { |pkg| }
+Rake::GemPackageTask.new(eval(File.read("friendly_id_sequel.gemspec"))) { |pkg| }
 Rake::TestTask.new(:test) { |t| t.pattern = "test/*_test.rb" }
 
 begin

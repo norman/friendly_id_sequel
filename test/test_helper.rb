@@ -9,7 +9,6 @@ rescue LoadError
 end
 
 require "sequel"
-require "sequel/extensions/migration"
 require "active_support"
 require "friendly_id"
 require "friendly_id/test"
@@ -17,16 +16,13 @@ require "logger"
 require "test/unit"
 require "mocha"
 
-DB = Sequel.sqlite
-
 require File.dirname(__FILE__) + "/../lib/friendly_id_sequel"
-require File.dirname(__FILE__) + "/../lib/friendly_id/sequel_adapter/create_slugs"
 require File.dirname(__FILE__) + "/core"
 require File.dirname(__FILE__) + "/simple"
 require File.dirname(__FILE__) + "/slugged"
 
+DB = Sequel.sqlite
 FriendlyId::SequelAdapter::CreateSlugs.apply(DB, :up)
-require File.dirname(__FILE__) + "/../lib/friendly_id/sequel_adapter/slug"
 
 %w[books users].each do |table|
   DB.create_table(table) do
@@ -38,9 +34,9 @@ end
 
 class Book < Sequel::Model; end
 class User < Sequel::Model; end
-
-Book.plugin :friendly_id, :name
-User.plugin :friendly_id, :name
+[Book, User].each do |klass|
+  klass.plugin :friendly_id, :name
+end
 
 %w[animals cities people posts].each do |table|
   DB.create_table(table) do
