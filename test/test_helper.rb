@@ -1,4 +1,13 @@
-require "rubygems"
+begin
+  # Try to require the preresolved locked set of gems.
+  require File.join(File.dirname(__FILE__), "..", ".bundle", "environment")
+rescue LoadError
+  # Fall back on doing an unlocked resolve at runtime.
+  require "rubygems"
+  require "bundler"
+  Bundler.setup
+end
+
 require "sequel"
 require "sequel/extensions/migration"
 require "active_support"
