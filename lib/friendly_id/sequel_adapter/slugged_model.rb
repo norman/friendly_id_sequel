@@ -52,6 +52,7 @@ module FriendlyId
       private
 
       def after_save
+        return if friendly_id_config.allow_nil? && !@slug
         @slug.sluggable_id = id
         @slug.save
       end
@@ -59,6 +60,10 @@ module FriendlyId
       def build_slug
         self.slug = SluggedModel.slug_class.new :name => slug_text,
           :sluggable_type => self.class.to_s
+      end
+
+      def skip_friendly_id_validations
+        friendly_id.nil? && friendly_id_config.allow_nil?
       end
 
       def validate

@@ -34,6 +34,10 @@ module FriendlyId
         sluggable_type.constantize.friendly_id_config.sequence_separator
       end
 
+      def validate
+        errors.add(:name, "can't be blank") if name.blank?
+      end
+
     end
   end
 end
