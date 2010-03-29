@@ -3,7 +3,7 @@ module FriendlyId
     class Slug < ::Sequel::Model
 
       def to_friendly_id
-        sequence > 1 ? friendly_id_with_sequence : name
+        sequence.to_i > 1 ? friendly_id_with_sequence : name
       end
 
       private
