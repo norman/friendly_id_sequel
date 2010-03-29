@@ -9,7 +9,7 @@ module FriendlyId
         include FriendlyId::Finders::Single
 
         def find
-          with_sql(query).first if friendly?
+          with_sql(query).first if !unfriendly?
         end
 
         private
