@@ -6,11 +6,20 @@ module FriendlyId
         sequence.to_i > 1 ? friendly_id_with_sequence : name
       end
 
+      # Whether this slug is the most recent of its owner's slugs.
+      def current?
+        sluggable.slug == self
+      end
+
       private
+
+      def sluggable
+        sluggable_type.constantize[sluggable_id]
+      end
 
       def before_create
         self.sequence = next_sequence
-        self.created_at = DateTime.now
+        self.created_at = Time.now
       end
 
       def enable_name_reversion
@@ -37,7 +46,6 @@ module FriendlyId
       def validate
         errors.add(:name, "can't be blank") if name.blank?
       end
-
     end
   end
 end

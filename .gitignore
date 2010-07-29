@@ -7,4 +7,5 @@ pkg
 coverage
 *.swp
 .bundle
+Gemfile
 Gemfile.lock

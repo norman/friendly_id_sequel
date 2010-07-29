@@ -1,25 +1,18 @@
-begin
-  # Try to require the preresolved locked set of gems.
-  require File.join(File.dirname(__FILE__), "..", ".bundle", "environment")
-rescue LoadError
-  # Fall back on doing an unlocked resolve at runtime.
-  require "rubygems"
-  require "bundler"
-  Bundler.setup
-end
+require "rubygems"
+require "bundler"
+Bundler.setup
 
 require "sequel"
-require "active_support"
 require "friendly_id"
 require "friendly_id/test"
+require "friendly_id_sequel"
 require "logger"
 require "test/unit"
 require "mocha"
 
-require File.dirname(__FILE__) + "/../lib/friendly_id_sequel"
-require File.dirname(__FILE__) + "/core"
-require File.dirname(__FILE__) + "/simple"
-require File.dirname(__FILE__) + "/slugged"
+require File.expand_path("../core", __FILE__)
+require File.expand_path("../simple", __FILE__)
+require File.expand_path("../slugged", __FILE__)
 
 DB = Sequel.sqlite
 FriendlyId::SequelAdapter::CreateSlugs.apply(DB, :up)
@@ -60,4 +53,4 @@ end
   klass.plugin :friendly_id, :name, :use_slug => true
 end
 
-# DB.loggers << Logger.new($stdout)
+DB.loggers << Logger.new($stdout) if ENV["LOG"]

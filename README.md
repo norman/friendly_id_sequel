@@ -8,9 +8,7 @@ It currently supports all of FriendlyId's features except:
 * Rake tasks
 * Rails Generator
 
-Currently, only finds using `[]` are supported; I'll be adding some custom
-filters to make working with slugged records easier if anybody ends up using
-this.
+Currently, only finds using `[]` are supported:
 
     @post = Post["this-is-a-title"]
     @post.friendly_id # this-is-a-title
@@ -19,13 +17,25 @@ this.
 
     gem install friendly_id friendly_id_sequel
 
+    require "rubygems"
     require "friendly_id"
     require "friendly_id/sequel"
 
-    class Post < Sequel::Model
-      plugin :friendly_id :title, :use_slug => true
+    DB = Sequel.sqlite
+    FriendlyId::SequelAdapter::CreateSlugs.apply(DB, :up)
+
+    DB.create_table("books") do
+      primary_key :id, :type => Integer
+      string :name, :unique => true
+      string :note
     end
 
+    class Book < Sequel::Model
+      plugin :friendly_id, :name, :use_slug => true
+    end
+
+    Book.create("name" => "Ficciones", "note" => "Jorge Luis Borges's classic short stories.")
+    p Book["ficciones"]
 
 For more information on the available features, please see the
 [FriendlyId Guide](http://norman.github.com/friendly_id/file.Guide.html).

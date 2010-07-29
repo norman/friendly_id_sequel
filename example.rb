@@ -1,5 +1,6 @@
 require "rubygems"
-require "active_support"
+require "bundler"
+Bundler.setup
 require "friendly_id"
 require "friendly_id/sequel"
 

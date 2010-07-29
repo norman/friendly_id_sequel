@@ -1,0 +1,6 @@
+source :rubygems
+gem "sequel"
+gem "friendly_id", ">= 3.1.0"
+gem "friendly_id_sequel", :path => File.expand_path("..", __FILE__)
+gem "mocha"
+gem "sqlite3-ruby"

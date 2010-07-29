@@ -1,30 +1,17 @@
 module FriendlyId
   module SequelAdapter
-
     module SimpleModel
-
-      class SingleFinder
-
-        include FriendlyId::Finders::Base
-        include FriendlyId::Finders::Single
-
-        def find
-          with_sql(query).first if !unfriendly?
-        end
-
-        private
-
-        def query
-          table = simple_table
-          column = friendly_id_config.column
-          "SELECT * FROM #{table} WHERE #{column} = #{dataset.literal(id)}"
-        end
-
-      end
 
       def self.included(base)
         def base.primary_key_lookup(pk)
-          SingleFinder.new(pk, self).find or super
+          if !pk.unfriendly_id?
+            table = simple_table
+            column = friendly_id_config.column
+            query = "SELECT * FROM #{table} WHERE #{column} = #{dataset.literal(pk)}"
+            with_sql(query).first or super
+          else
+            super
+          end
         end
       end
 
@@ -60,7 +47,6 @@ module FriendlyId
       def friendly_id_config
         self.class.friendly_id_config
       end
-
     end
   end
 end

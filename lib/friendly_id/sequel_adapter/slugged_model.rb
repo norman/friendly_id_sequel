@@ -3,31 +3,6 @@ module FriendlyId
 
     module SluggedModel
 
-      class SingleFinder
-
-        include FriendlyId::Finders::Base
-        include FriendlyId::Finders::Single
-
-        def find
-          join(*join_conditions).select(columns).where(conditions).first
-        end
-
-        private
-
-        def columns
-          :"#{table_name}".*
-        end
-
-        def conditions
-          {:name.qualify("slugs") => name, :sequence.qualify("slugs") => sequence}
-        end
-
-        def join_conditions
-          return :slugs, :sluggable_id => :id, :sluggable_type => model_class.to_s
-        end
-
-      end
-
       include FriendlyId::Slugged::Model
 
       def self.included(base)
@@ -38,7 +13,16 @@ module FriendlyId
           :order => "id DESC"
         def base.[](*args)
           if args.size == 1
-            SingleFinder.new(args.first, self).find or super
+            return super if args.first.unfriendly_id?
+            name, sequence = args.first.to_s.parse_friendly_id
+            join_conditions = [:slugs, {:sluggable_id => :id, :sluggable_type => self.to_s}]
+            conditions = {:name.qualify("slugs") => name, :sequence.qualify("slugs") => sequence}
+            cols = columns.map {|c| c.qualify(table_name)}
+            result = join(*join_conditions).select(*cols).where(conditions).first
+            return super unless result
+            result.friendly_id_status.name = name
+            result.friendly_id_status.sequence = sequence
+            result
           else
             super
           end
@@ -49,8 +33,12 @@ module FriendlyId
         FriendlyId::SequelAdapter::Slug
       end
 
+      def slug
+        @slug ||= slugs(true).first
+      end
+
       def find_slug(name, sequence)
-        slugs_dataset.where("slugs.name" => name, "slugs.sequence" => sequence).first
+        slugs_dataset.where("slugs.name".lit => name, "slugs.sequence".lit => sequence).first
       end
 
       private
@@ -78,7 +66,6 @@ module FriendlyId
       rescue FriendlyId::ReservedError
         return errors.add(method, "is reserved")
       end
-
     end
   end
 end
