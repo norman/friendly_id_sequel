@@ -35,7 +35,7 @@ module FriendlyId
       def next_sequence
         enable_name_reversion
         conditions =  { :name => name, :scope => scope, :sluggable_type => sluggable_type }
-        prev = self.class.filter(conditions).order("sequence DESC").first
+        prev = self.class.filter(conditions).order(:sequence.desc).first
         prev ? prev.sequence.succ : 1
       end
 
