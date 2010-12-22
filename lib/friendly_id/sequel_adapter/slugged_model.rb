@@ -13,7 +13,7 @@ module FriendlyId
           :order => "id DESC"
         def base.[](*args)
           if args.size == 1
-            return super if args.first.unfriendly_id?
+            return super if args.first.kind_of?(Hash) or args.first.unfriendly_id?
             name, sequence = args.first.to_s.parse_friendly_id
             join_conditions = [:slugs, {:sluggable_id => :id, :sluggable_type => self.to_s}]
             conditions = {:name.qualify("slugs") => name, :sequence.qualify("slugs") => sequence}
