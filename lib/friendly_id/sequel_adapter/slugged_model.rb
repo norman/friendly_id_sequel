@@ -10,7 +10,7 @@ module FriendlyId
           :class => slug_class,
           :key => "sluggable_id",
           :conditions => {:sluggable_type => "#{base.to_s}"},
-          :order => "id DESC"
+          :order => :id.desc
         def base.[](*args)
           if args.size == 1
             return super if args.first.kind_of?(Hash) or args.first.unfriendly_id?
