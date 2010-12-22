@@ -43,6 +43,10 @@ module FriendlyId
 
       private
 
+      def scope_changed?
+        friendly_id_config.scope? && send(friendly_id_config.scope).friendly_id != slug.scope
+      end
+
       def after_save
         return if friendly_id_config.allow_nil? && !@slug
         @slug.sluggable_id = id
@@ -51,7 +55,10 @@ module FriendlyId
 
       def build_slug
         self.slug = SluggedModel.slug_class.new :name => slug_text,
-          :sluggable_type => self.class.to_s
+          :sluggable_type => self.class.to_s,
+          :scope => friendly_id_config.scope_for(self)
+        @new_friendly_id = self.slug.to_friendly_id
+        self.slug
       end
 
       def skip_friendly_id_validations
@@ -66,6 +73,36 @@ module FriendlyId
       rescue FriendlyId::ReservedError
         return errors.add(method, "is reserved")
       end
+
+      # Update the slugs for any model that is using this model as its
+      # FriendlyId scope.
+      def after_update
+        #require 'ruby-debug'; debugger
+        update_scope
+        update_dependent_scopes
+      end
+
+      def update_dependent_scopes
+        return unless friendly_id_config.class.scopes_used?
+        if @new_friendly_id
+          friendly_id_config.child_scopes.each do |klass|
+            Slug.filter(:sluggable_type => klass.to_s, :scope => slugs.first.to_friendly_id).update(:scope => @new_friendly_id)
+          end
+        end
+      end
+
+      def update_scope
+        return unless slug && scope_changed?
+        DB.transaction do
+          slug.scope = send(friendly_id_config.scope).friendly_id
+          similar = Slug.similar_to(slug)
+          if !similar.empty?
+            slug.sequence = similar.first.sequence.succ
+          end
+          slug.save
+        end
+      end
+
     end
   end
 end

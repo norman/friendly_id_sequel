@@ -11,6 +11,14 @@ module FriendlyId
         sluggable.slug == self
       end
 
+      def self.similar_to(slug)
+        filter({
+          :name           => slug.name,
+          :scope          => slug.scope,
+          :sluggable_type => slug.sluggable_type
+        }).order(:sequence.asc).all
+      end
+
       private
 
       def sluggable

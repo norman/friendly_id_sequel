@@ -1,4 +1,5 @@
 require "sequel"
+require 'friendly_id/sequel_adapter/configuration'
 require "friendly_id/sequel_adapter/simple_model"
 require "friendly_id/sequel_adapter/slugged_model"
 require "friendly_id/sequel_adapter/create_slugs"
@@ -17,7 +18,7 @@ module Sequel
 
       def self.configure(model, method, opts={})
         model.instance_eval do
-          self.friendly_id_config = ::FriendlyId::Configuration.new(model, method, opts)
+          self.friendly_id_config = ::FriendlyId::SequelAdapter::Configuration.new(model, method, opts)
           if friendly_id_config.use_slug?
             require "friendly_id/sequel_adapter/slug"
             include ::FriendlyId::SequelAdapter::SluggedModel

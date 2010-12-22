@@ -38,7 +38,25 @@ module FriendlyId
         return errors.add(column, "is reserved") if friendly_id_config.reserved?(value)
       end
 
+      def before_update
+        @old_friendly_id = HomeOwner[id].friendly_id
+      end
+
+      def after_update
+        update_scopes
+      end
+
       private
+
+      # Update the slugs for any model that is using this model as its
+      # FriendlyId scope.
+      def update_scopes
+        if @old_friendly_id != friendly_id
+          friendly_id_config.child_scopes.each do |klass|
+            Slug.filter(:sluggable_type => klass.to_s, :scope => @old_friendly_id).update(:scope => friendly_id)
+          end
+        end
+      end
 
       def skip_friendly_id_validations
         friendly_id.nil? && self.class.friendly_id_config.allow_nil?
