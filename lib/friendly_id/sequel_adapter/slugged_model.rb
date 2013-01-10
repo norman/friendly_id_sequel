@@ -62,9 +62,11 @@ module FriendlyId
         build_slug if new_slug_needed?
         method = friendly_id_config.method
       rescue FriendlyId::BlankError
-        return errors.add(method, "can't be blank")
+        errors.add(method, "can't be blank")
       rescue FriendlyId::ReservedError
-        return errors.add(method, "is reserved")
+        errors.add(method, "is reserved")
+      ensure
+        super
       end
     end
   end
