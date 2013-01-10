@@ -31,11 +31,14 @@ module FriendlyId
       end
 
       def validate
-        return if skip_friendly_id_validations
-        column = friendly_id_config.column
-        value = send(column)
-        return errors.add(column, "can't be blank") if value.blank?
-        return errors.add(column, "is reserved") if friendly_id_config.reserved?(value)
+        unless skip_friendly_id_validations
+          column = friendly_id_config.column
+          value = send(column)
+          errors.add(column, "can't be blank") if value.blank?
+          errors.add(column, "is reserved") if friendly_id_config.reserved?(value)
+        end
+
+        super
       end
 
       private
