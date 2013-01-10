@@ -65,9 +65,9 @@ module FriendlyId
         errors.add(method, "can't be blank")
       rescue FriendlyId::ReservedError
         errors.add(method, "is reserved")
+      ensure
+        super
       end
-
-      super
     end
   end
 end
